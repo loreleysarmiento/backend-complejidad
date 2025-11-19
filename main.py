@@ -9,7 +9,7 @@ import models.route      # noqa: F401
 
 from routers import auth, routes , airports,profile
 
-Base.metadata.create_all(bind=engine)
+#Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Complejidad Routes API")
 

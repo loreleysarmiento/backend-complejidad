@@ -24,4 +24,4 @@ def list_airports(
     """
     Devuelve la lista de aeropuertos (solo visibles si estás logueado).
     """
-    return db.query(Airport).order_by(Airport.airport_id).offset(skip).limit(limit).all()
+    return db.query(Airport).order_by(Airport.id).offset(skip).limit(limit).all()

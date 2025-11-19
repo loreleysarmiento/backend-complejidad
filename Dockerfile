@@ -8,23 +8,12 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Instalar dependencias de sistema (psycopg2, pandas, pyodbc y ODBC Driver 18)
+# Dependencias de sistema (psycopg2, pandas, etc.)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        curl \
-        gnupg \
-        ca-certificates \
-        apt-transport-https \
         build-essential \
         libpq-dev \
-        unixodbc \
-        unixodbc-dev && \
-    # Agregar repo de Microsoft para ODBC Driver (sin usar apt-key)
-    curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.gpg && \
-    curl https://packages.microsoft.com/config/debian/12/prod.list -o /etc/apt/sources.list.d/mssql-release.list && \
-    apt-get update && \
-    ACCEPT_EULA=Y apt-get install -y msodbcsql18 && \
-    rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Instalar dependencias Python
 COPY requirements.txt .

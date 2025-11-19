@@ -5,8 +5,10 @@ from core.config import settings
 engine = create_engine(
     settings.DATABASE_URL,
     future=True,
+    connect_args={
+        "cafile": "/etc/ssl/certs/ca-certificates.crt",
+    },
 )
-
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db():

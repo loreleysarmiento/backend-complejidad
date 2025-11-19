@@ -23,9 +23,9 @@ class RouteCalculated(Base):
 
     id = Column("route_id", Integer, primary_key=True, index=True)
 
-    user_id = Column("user_id", Integer, ForeignKey("Usuarios.user_id"), nullable=False)
-    origin_id = Column("origin_id", Integer, ForeignKey("Aeropuertos.airport_id"), nullable=False)
-    destiny_id = Column("destiny_id", Integer, ForeignKey("Aeropuertos.airport_id"), nullable=False)
+    user_id = Column("user_id", Integer, ForeignKey("Usuarios.id"), nullable=False)
+    origin_id = Column("origin_id", Integer, ForeignKey("Aeropuertos.id"), nullable=False)
+    destiny_id = Column("destiny_id", Integer, ForeignKey("Aeropuertos.id"), nullable=False)
 
     total_distance = Column(Float, nullable=False)
     total_cost = Column(Numeric(10, 2), nullable=False)

@@ -4,7 +4,7 @@ from db.base import Base
 
 
 class Connection(Base):
-    __tablename__ = "connections"
+    __tablename__ = "Conexiones"
 
     id = Column(Integer, primary_key=True, index=True)  # connection_id
     airport_a_id = Column(Integer, ForeignKey("airports.id"), nullable=False)

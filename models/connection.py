@@ -11,13 +11,13 @@ class Connection(Base):
     airport_a_id = Column(
         "airport_a",
         Integer,
-        ForeignKey("Aeropuertos.id"),
+        ForeignKey("Aeropuertos.airport_id"),
         nullable=False,
     )
     airport_b_id = Column(
         "airport_b",
         Integer,
-        ForeignKey("Aeropuertos.id"),
+        ForeignKey("Aeropuertos.airport_id"),
         nullable=False,
     )
 

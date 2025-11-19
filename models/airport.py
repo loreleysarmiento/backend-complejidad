@@ -4,7 +4,7 @@ from db.base import Base
 
 
 class Airport(Base):
-    __tablename__ = "airports"
+    __tablename__ = "Aeropuertos"
 
     id = Column(Integer, primary_key=True, index=True)  # airport_id
     name = Column(String(150), nullable=False)

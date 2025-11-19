@@ -8,7 +8,7 @@ class User(Base):
 
     id = Column("user_id", Integer, primary_key=True, index=True)
     username = Column("username",String(50), unique=True, index=True, nullable=False)
-    hashed_password = Column("hashed_password",String(255), nullable=False)
+    hashed_password = Column("hash_password",String(255), nullable=False)
     registered_at = Column("registered_at",DateTime(timezone=True), server_default=func.now())
 
     routes = relationship("RouteCalculated", back_populates="user")

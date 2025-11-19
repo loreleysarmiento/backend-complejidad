@@ -26,7 +26,7 @@ class RouteCriteriaEnum(str, enum.Enum):
 
 
 class RouteCalculated(Base):
-    __tablename__ = "routes_calculated"
+    __tablename__ = "RutasCalculadas"
 
     id = Column(Integer, primary_key=True, index=True)  # route_id
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -35,7 +35,7 @@ class RouteCalculated(Base):
     total_distance = Column(Float, nullable=False)
     total_cost = Column(Numeric(10, 2), nullable=False)
     query_date = Column(DateTime(timezone=True), server_default=func.now())
-    criteria = Column(String(20), nullable=False)  # 'distance' o 'cost'
+    criteria = Column(String(20), nullable=False)  
     total_stops = Column(Integer, nullable=False, default=0)
     algorithm = Column(String(30), nullable=False, default="dijkstra")
 
@@ -44,7 +44,7 @@ class RouteCalculated(Base):
 
 
 class RouteDetail(Base):
-    __tablename__ = "route_details"
+    __tablename__ = "DetalleRuta"
 
     id = Column(Integer, primary_key=True, index=True)  # detail_id
     route_id = Column(Integer, ForeignKey("routes_calculated.id"), nullable=False)

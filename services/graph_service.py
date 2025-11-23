@@ -16,7 +16,7 @@ def build_graph(db: Session) -> nx.Graph:
         G.add_edge(
             c.airport_a_id,
             c.airport_b_id,
-            distance=c.distance_km,
+            distance=c.distance,
             cost=float(c.cost),
         )
     return G

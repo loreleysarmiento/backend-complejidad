@@ -21,7 +21,7 @@ class Connection(Base):
         nullable=False,
     )
 
-    distance_km = Column("distance", Float, nullable=False)
+    distance = Column("distance", Float, nullable=False)
     congestion_factor = Column(Float, nullable=False, default=1.0)  # si no existe, quítala
     cost = Column(Numeric(10, 2), nullable=False)
 

@@ -12,7 +12,7 @@ class Airport(Base):
     country = Column(String(100), nullable=True)
     lat = Column(Float, nullable=False)
     lon = Column(Float, nullable=False)
-    concurrency_level = Column(Integer, nullable=False, default=3)
+    concurrency = Column(Integer, nullable=False, default=3)
 
     connections_from = relationship(
         "Connection",

@@ -22,7 +22,7 @@ class Connection(Base):
     )
 
     distance_km = Column("distance", Float, nullable=False)
-    #congestion_factor = Column(Float, nullable=False, default=1.0)  # si no existe, quítala
+    congestion_factor = Column(Float, nullable=False, default=1.0)  # si no existe, quítala
     cost = Column(Numeric(10, 2), nullable=False)
 
     airport_a = relationship("Airport", foreign_keys=[airport_a_id], back_populates="connections_from")

@@ -30,9 +30,9 @@ class RouteCalculated(Base):
     total_distance = Column(Float, nullable=False)
     total_cost = Column(Numeric(10, 2), nullable=False)
     query_date = Column(DateTime(timezone=True), server_default=func.now())
-    #criteria = Column(String(20), nullable=False)
-    #total_stops = Column(Integer, nullable=False, default=0)
-    #algorithm = Column(String(30), nullable=False, default="dijkstra")
+    criteria = Column(String(20), nullable=False)
+    total_stops = Column(Integer, nullable=False, default=0)
+    algorithm = Column(String(30), nullable=False, default="dijkstra")
 
     user = relationship("User", back_populates="routes")
     details = relationship("RouteDetail", back_populates="route", cascade="all, delete-orphan")

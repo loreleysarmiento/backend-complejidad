@@ -9,7 +9,7 @@ from core.security import get_current_user
 from models.user import User
 from models.route import RouteCalculated, RouteDetail
 from schemas.route import RouteCalculateRequest, RouteHistoryItem
-from services.graph_service import build_graph, calculate_shortest_path  
+from services.graph_service import build_graph_for_route, calculate_shortest_path  
 
 router = APIRouter(
     prefix="/routes",

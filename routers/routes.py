@@ -87,6 +87,26 @@ def calculate_route_endpoint(
     db.refresh(route)
     return route
 
+@router.get("/history", response_model=list[RouteHistoryItem])
+def get_history(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Devuelve el historial de rutas calculadas por el usuario actual,
+    ordenadas de la más reciente a la más antigua.
+    """
+    routes = (
+        db.query(RouteCalculated)
+        .filter(RouteCalculated.user_id == current_user.id)
+        .order_by(RouteCalculated.query_date.desc())
+        .all()
+    )
+    return routes
+
+
+
+
 @router.delete("/history/{route_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_history_item(
     route_id: int,

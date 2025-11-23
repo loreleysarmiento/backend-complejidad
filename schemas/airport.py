@@ -3,7 +3,7 @@ from pydantic import BaseModel
 class AirportRead(BaseModel):
     id: int
     name: str        
-    city: str
+    city: Optional[str] = None
     country: str
     lat: float
     lon: float

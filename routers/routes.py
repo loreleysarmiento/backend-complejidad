@@ -24,18 +24,23 @@ def calculate_route_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    # 1) Construir el grafo desde la BD
-    G = build_graph(db)
-
-    # 2) Calcular ruta con tu función
+    
     try:
-        (
-            path_nodes,
-            total_distance,
-            total_cost,
-            total_stops,
-            algorithm,
-        ) = calculate_shortest_path(
+        G = build_graph_for_route(
+            db,
+            origin_id=body.origin_id,
+            destiny_id=body.destiny_id,
+            max_nodes=300,   
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+   
+    try:
+        path_nodes, total_distance, total_cost = calculate_shortest_path(
             G,
             origin_id=body.origin_id,
             destiny_id=body.destiny_id,
@@ -44,10 +49,18 @@ def calculate_route_endpoint(
     except nx.NetworkXNoPath:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No se encontró ruta entre los aeropuertos indicados",
+            detail="No se encontró ruta entre los aeropuertos indicados.",
+        )
+    except nx.NodeNotFound:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Alguno de los aeropuertos indicados no existe en el grafo.",
         )
 
-    # 3) Guardar cabecera en routes_calculated
+    total_stops = max(len(path_nodes) - 2, 0)
+    algorithm = "dijkstra"
+
+    
     route = RouteCalculated(
         user_id=current_user.id,
         origin_id=body.origin_id,
@@ -59,9 +72,9 @@ def calculate_route_endpoint(
         algorithm=algorithm,
     )
     db.add(route)
-    db.flush()  # consigue route.id sin hacer commit todavía
+    db.flush()
 
-    # 4) Guardar detalle de la ruta
+    
     for order, airport_id in enumerate(path_nodes):
         detail = RouteDetail(
             route_id=route.id,
@@ -73,21 +86,6 @@ def calculate_route_endpoint(
     db.commit()
     db.refresh(route)
     return route
-
-
-@router.get("/history", response_model=list[RouteHistoryItem])
-def get_history(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    routes = (
-        db.query(RouteCalculated)
-        .filter(RouteCalculated.user_id == current_user.id)
-        .order_by(RouteCalculated.query_date.desc())
-        .all()
-    )
-    return routes
-
 
 @router.delete("/history/{route_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_history_item(

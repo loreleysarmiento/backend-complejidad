@@ -24,13 +24,12 @@ def calculate_route_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    
     try:
         G = build_graph_for_route(
             db,
             origin_id=body.origin_id,
             destiny_id=body.destiny_id,
-            max_nodes=300,   
+            max_nodes=300,
         )
     except ValueError as e:
         raise HTTPException(
@@ -38,7 +37,6 @@ def calculate_route_endpoint(
             detail=str(e),
         )
 
-   
     try:
         path_nodes, total_distance, total_cost = calculate_shortest_path(
             G,
@@ -58,9 +56,14 @@ def calculate_route_endpoint(
         )
 
     total_stops = max(len(path_nodes) - 2, 0)
-    algorithm = "dijkstra"
 
-    
+    if body.criteria == RouteCriteriaEnum.DISTANCE:
+        algorithm = "dijkstra"
+    elif body.criteria == RouteCriteriaEnum.COST:
+        algorithm = "bellman_ford"
+    else:
+        algorithm = "dijkstra"
+
     route = RouteCalculated(
         user_id=current_user.id,
         origin_id=body.origin_id,
@@ -74,7 +77,6 @@ def calculate_route_endpoint(
     db.add(route)
     db.flush()
 
-    
     for order, airport_id in enumerate(path_nodes):
         detail = RouteDetail(
             route_id=route.id,
@@ -86,6 +88,7 @@ def calculate_route_endpoint(
     db.commit()
     db.refresh(route)
     return route
+
 
 @router.get("/history", response_model=list[RouteHistoryItem])
 def get_history(

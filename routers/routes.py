@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from db.session import get_db
 from core.security import get_current_user
 from models.user import User
-from models.route import RouteCalculated, RouteDetail
+from models.route import RouteCalculated, RouteDetail, RouteCriteriaEnum
 from schemas.route import RouteCalculateRequest, RouteHistoryItem
 from services.graph_service import build_graph_for_route, calculate_shortest_path  
 

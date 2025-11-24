@@ -10,10 +10,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/logout")
 def logout(current_user: User = Depends(get_current_user)):
-    """
-    Logout 'lógico'. Con JWT stateless en realidad el front solo
-    tiene que borrar el token. Este endpoint existe para la integración.
-    """
+    
     return {"message": "Logged out successfully"}
 
 @router.get("/profile", response_model=UserRead)

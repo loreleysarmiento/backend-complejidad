@@ -1,4 +1,3 @@
-# app/services/route_service.py
 from sqlalchemy.orm import Session
 from decimal import Decimal, ROUND_HALF_UP
 from models.route import RouteCalculated, RouteDetail, RouteCriteriaEnum
@@ -33,7 +32,7 @@ def create_route_for_user(
         algorithm="dijkstra",
     )
     db.add(route)
-    db.flush()  # para tener route.id
+    db.flush()  
 
     for order, airport_id in enumerate(path):
         detail = RouteDetail(

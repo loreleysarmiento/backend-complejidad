@@ -10,5 +10,4 @@ class AirportRead(BaseModel):
     lon: float
 
     class Config:
-        # En Pydantic v2 reemplaza a orm_mode = True
         from_attributes = True

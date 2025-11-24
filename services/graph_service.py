@@ -229,20 +229,36 @@ def calculate_shortest_path(
     criteria: str,
 ):
     """
-    Calcula el camino más corto según criteria: 'distance' o 'cost'.
+    Calcula el camino más corto según criteria:
+    - 'distance'  -> Dijkstra sobre atributo 'distance'
+    - 'cost'      -> Bellman-Ford sobre atributo 'cost'
     Devuelve: path, total_distance, total_cost
     """
-    if criteria == "distance":
-        weight_attr = "distance"
-    else:
-        weight_attr = "cost"
 
-    path = nx.shortest_path(
-        G,
-        source=origin_id,
-        target=destiny_id,
-        weight=weight_attr,
-    )
+    if criteria == "distance":
+       
+        path = nx.dijkstra_path(
+            G,
+            source=origin_id,
+            target=destiny_id,
+            weight="distance",
+        )
+    elif criteria == "cost":
+       
+        path = nx.bellman_ford_path(
+            G,
+            source=origin_id,
+            target=destiny_id,
+            weight="cost",
+        )
+    else:
+        
+        path = nx.dijkstra_path(
+            G,
+            source=origin_id,
+            target=destiny_id,
+            weight="distance",
+        )
 
     total_distance = 0.0
     total_cost = 0.0
@@ -253,3 +269,4 @@ def calculate_shortest_path(
         total_cost += float(data["cost"])
 
     return path, total_distance, total_cost
+

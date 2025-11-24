@@ -86,7 +86,7 @@ def _ensure_connections_for_subset(
             current_degree[b] += 1
         edge_set.add(frozenset({a, b}))
 
-    # Target aleatorio 3/5/7, pero nunca menor al grado actual y máximo 7
+    
     target_degree: dict[int, int] = {}
     for aid in subset_ids:
         rnd = random.choice([3, 5, 7])
@@ -94,7 +94,7 @@ def _ensure_connections_for_subset(
         target = min(target, 7)  # límite superior
         target_degree[aid] = target
 
-    # Coords solo del subconjunto
+    
     coords = [
         (a.id, a.lat, a.lon)
         for a in airports
@@ -228,12 +228,6 @@ def calculate_shortest_path(
     destiny_id: int,
     criteria: str,
 ):
-    """
-    Calcula el camino más corto según criteria:
-    - 'distance'  -> Dijkstra sobre atributo 'distance'
-    - 'cost'      -> Bellman-Ford sobre atributo 'cost'
-    Devuelve: path, total_distance, total_cost
-    """
 
     if criteria == "distance":
        

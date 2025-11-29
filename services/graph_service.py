@@ -222,6 +222,9 @@ def build_graph_for_route(
     return G
 
 
+import networkx as nx
+from typing import Optional
+
 def calculate_shortest_path(
     G: nx.Graph,
     origin_id: int,
@@ -229,15 +232,15 @@ def calculate_shortest_path(
     criteria: str,
     max_stops: Optional[int] = None,
     max_concurrency: Optional[int] = None,
+    max_candidates: int = 200,   
 ):
     """
-    Calcula la mejor ruta según el criterio (distance/cost), 
-    aplicando restricciones:
+    Calcula la mejor ruta según el criterio (distance/cost),
+    aplicando restricciones opcionales:
       - max_stops: número máximo de paradas (nodos intermedios)
       - max_concurrency: concurrencia máxima permitida en los aeropuertos
     """
 
-    
     if max_stops is None and max_concurrency is None:
         if criteria == "distance":
             path = nx.dijkstra_path(
@@ -263,15 +266,11 @@ def calculate_shortest_path(
 
         total_distance = 0.0
         total_cost = 0.0
-
         for i in range(len(path) - 1):
             data = G.get_edge_data(path[i], path[i + 1])
             total_distance += float(data["distance"])
             total_cost += float(data["cost"])
-
         return path, total_distance, total_cost
-
-    
 
 
     if criteria == "distance":
@@ -281,7 +280,6 @@ def calculate_shortest_path(
     else:
         weight_attr = "distance"
 
-   
     paths_generator = nx.shortest_simple_paths(
         G,
         source=origin_id,
@@ -289,26 +287,25 @@ def calculate_shortest_path(
         weight=weight_attr,
     )
 
-    for path in paths_generator:
-       
+    for idx, path in enumerate(paths_generator):
+        if idx >= max_candidates:
+            break
+
         stops = max(len(path) - 2, 0)
         if max_stops is not None and stops > max_stops:
-            continue  
+            continue
 
-        
         if max_concurrency is not None:
             invalid = False
             for node_id in path:
                 node_data = G.nodes[node_id]
-                
-                concurrency = node_data.get("concurrency", 0)
-                if concurrency > max_concurrency:
+                conc = int(node_data.get("concurrency", 0) or 0)
+                if conc > max_concurrency:
                     invalid = True
                     break
             if invalid:
-                continue 
+                continue
 
-        
         total_distance = 0.0
         total_cost = 0.0
         for i in range(len(path) - 1):
@@ -318,8 +315,8 @@ def calculate_shortest_path(
 
         return path, total_distance, total_cost
 
-    
     raise nx.NetworkXNoPath(
-        f"No se encontró ruta que cumpla las restricciones (max_stops={max_stops}, "
-        f"max_concurrency={max_concurrency})."
+        f"No se encontró ruta que cumpla las restricciones dentro del límite de búsqueda "
+        f"(max_candidates={max_candidates}, max_stops={max_stops}, max_concurrency={max_concurrency})."
     )
+

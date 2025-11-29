@@ -43,11 +43,13 @@ def calculate_route_endpoint(
             origin_id=body.origin_id,
             destiny_id=body.destiny_id,
             criteria=body.criteria.value,
+            max_stops=body.max_stops,
+            max_concurrency=body.max_concurrency,
         )
-    except nx.NetworkXNoPath:
+    except nx.NetworkXNoPath as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No se encontró ruta entre los aeropuertos indicados.",
+            detail=str(e),
         )
     except nx.NodeNotFound:
         raise HTTPException(
@@ -56,6 +58,15 @@ def calculate_route_endpoint(
         )
 
     total_stops = max(len(path_nodes) - 2, 0)
+
+    avg_concurrency = None
+    if path_nodes:
+        sum_conc = 0
+        for node_id in path_nodes:
+            node_data = G.nodes[node_id]
+            conc = int(node_data.get("concurrency", 0) or 0)
+            sum_conc += conc
+        avg_concurrency = sum_conc / len(path_nodes)
 
     if body.criteria == RouteCriteriaEnum.DISTANCE:
         algorithm = "dijkstra"
@@ -87,6 +98,10 @@ def calculate_route_endpoint(
 
     db.commit()
     db.refresh(route)
+
+    route.max_stops = body.max_stops
+    route.avg_concurrency = avg_concurrency
+
     return route
 
 

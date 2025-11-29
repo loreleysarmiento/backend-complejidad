@@ -3,7 +3,7 @@ import math
 import random
 import networkx as nx
 from sqlalchemy.orm import Session
-
+from typing import Optional
 from models.airport import Airport
 from models.connection import Connection
 

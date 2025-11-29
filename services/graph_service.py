@@ -227,40 +227,99 @@ def calculate_shortest_path(
     origin_id: int,
     destiny_id: int,
     criteria: str,
+    max_stops: Optional[int] = None,
+    max_concurrency: Optional[int] = None,
 ):
+    """
+    Calcula la mejor ruta según el criterio (distance/cost), 
+    aplicando restricciones:
+      - max_stops: número máximo de paradas (nodos intermedios)
+      - max_concurrency: concurrencia máxima permitida en los aeropuertos
+    """
+
+    
+    if max_stops is None and max_concurrency is None:
+        if criteria == "distance":
+            path = nx.dijkstra_path(
+                G,
+                source=origin_id,
+                target=destiny_id,
+                weight="distance",
+            )
+        elif criteria == "cost":
+            path = nx.bellman_ford_path(
+                G,
+                source=origin_id,
+                target=destiny_id,
+                weight="cost",
+            )
+        else:
+            path = nx.dijkstra_path(
+                G,
+                source=origin_id,
+                target=destiny_id,
+                weight="distance",
+            )
+
+        total_distance = 0.0
+        total_cost = 0.0
+
+        for i in range(len(path) - 1):
+            data = G.get_edge_data(path[i], path[i + 1])
+            total_distance += float(data["distance"])
+            total_cost += float(data["cost"])
+
+        return path, total_distance, total_cost
+
+    
+
 
     if criteria == "distance":
-       
-        path = nx.dijkstra_path(
-            G,
-            source=origin_id,
-            target=destiny_id,
-            weight="distance",
-        )
+        weight_attr = "distance"
     elif criteria == "cost":
-       
-        path = nx.bellman_ford_path(
-            G,
-            source=origin_id,
-            target=destiny_id,
-            weight="cost",
-        )
+        weight_attr = "cost"
     else:
+        weight_attr = "distance"
+
+   
+    paths_generator = nx.shortest_simple_paths(
+        G,
+        source=origin_id,
+        target=destiny_id,
+        weight=weight_attr,
+    )
+
+    for path in paths_generator:
+       
+        stops = max(len(path) - 2, 0)
+        if max_stops is not None and stops > max_stops:
+            continue  
+
         
-        path = nx.dijkstra_path(
-            G,
-            source=origin_id,
-            target=destiny_id,
-            weight="distance",
-        )
+        if max_concurrency is not None:
+            invalid = False
+            for node_id in path:
+                node_data = G.nodes[node_id]
+                
+                concurrency = node_data.get("concurrency", 0)
+                if concurrency > max_concurrency:
+                    invalid = True
+                    break
+            if invalid:
+                continue 
 
-    total_distance = 0.0
-    total_cost = 0.0
+        
+        total_distance = 0.0
+        total_cost = 0.0
+        for i in range(len(path) - 1):
+            data = G.get_edge_data(path[i], path[i + 1])
+            total_distance += float(data["distance"])
+            total_cost += float(data["cost"])
 
-    for i in range(len(path) - 1):
-        data = G.get_edge_data(path[i], path[i + 1])
-        total_distance += float(data["distance"])
-        total_cost += float(data["cost"])
+        return path, total_distance, total_cost
 
-    return path, total_distance, total_cost
-
+    
+    raise nx.NetworkXNoPath(
+        f"No se encontró ruta que cumpla las restricciones (max_stops={max_stops}, "
+        f"max_concurrency={max_concurrency})."
+    )

@@ -11,6 +11,8 @@ class RouteCalculateRequest(BaseModel):
     origin_id: int
     destiny_id: int
     criteria: Criteria
+    max_stops: int | None = None         
+    max_concurrency: int | None = None   
 
 class RouteHistoryItem(BaseModel):
     id: int

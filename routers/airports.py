@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from db.session import get_db
@@ -10,7 +10,7 @@ from schemas.airport import AirportRead
 router = APIRouter(
     prefix="/airports",
     tags=["airports"],
-    dependencies=[Depends(get_current_user)],  
+    dependencies=[Depends(get_current_user)],
 )
 
 
@@ -22,6 +22,30 @@ def list_airports(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Devuelve la lista de aeropuertos (solo visibles si estás logueado).
+    Devuelve la lista de aeropuertos 
     """
-    return db.query(Airport).order_by(Airport.id).offset(skip).limit(limit).all()
+    return (
+        db.query(Airport)
+        .order_by(Airport.id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+@router.get("/{airport_id}", response_model=AirportRead)
+def get_airport_by_id(
+    airport_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Devuelve un aeropuerto por ID 
+    """
+    airport = db.query(Airport).filter(Airport.id == airport_id).first()
+    if not airport:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Airport not found",
+        )
+    return airport

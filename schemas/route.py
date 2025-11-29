@@ -22,6 +22,8 @@ class RouteHistoryItem(BaseModel):
     total_stops: int
     algorithm: str
     query_date: datetime
+    max_stops: int | None = None
+    avg_concurrency: float | None = None
 
     class Config:
         from_attributes = True
